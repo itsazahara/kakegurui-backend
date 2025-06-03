@@ -4,17 +4,16 @@ USE kakegurui;
 
 CREATE TABLE personaje (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     edad INT NOT NULL,
     role ENUM('Protagonista', 'Estudiante', 'Miembro del Consejo Estudiantil', 'Dealer') NOT NULL,
-    image LONGTEXT,
+    imagen LONGTEXT,
     descripcion TEXT
 );
 
 CREATE TABLE episodio (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    titulo VARCHAR(150) NOT NULL,
-    temporadas INT NOT NULL,
+    temporada INT NOT NULL,
     numero_episodio INT NOT NULL,
     sinopsis TEXT
 );
@@ -28,18 +27,19 @@ CREATE TABLE juego (
     FOREIGN KEY (id_episodio) REFERENCES episodio(id) ON DELETE CASCADE
 );
 
-CREATE TABLE apuestas (
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	id_personaje INT,
-	id_juego INT,
-	FOREIGN KEY (id_personaje) REFERENCES personaje(id) ON DELETE CASCADE,
-	FOREIGN KEY (id_juego) REFERENCES juego(id) ON DELETE CASCADE,
+CREATE TABLE apuesta (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_juego INT NOT NULL,
+    descripcion TEXT,
+    FOREIGN KEY (id_juego) REFERENCES juego(id) ON DELETE CASCADE
 );
 
-
--- CREATE TABLE quotes (
---    id SERIAL PRIMARY KEY,
-  --  quote TEXT NOT NULL,
-  --  character_id INT REFERENCES characters(id) ON DELETE CASCADE,
-  --  episode_id INT REFERENCES episodes(id) ON DELETE SET NULL
---);
+CREATE TABLE apostador (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_apuesta INT NOT NULL,
+    id_personaje INT NOT NULL,
+    item_apostado VARCHAR(100),
+    resultado ENUM('Ganador', 'Perdedor', 'Empate') DEFAULT NULL,
+    FOREIGN KEY (id_apuesta) REFERENCES apuesta(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_personaje) REFERENCES personaje(id) ON DELETE CASCADE
+);

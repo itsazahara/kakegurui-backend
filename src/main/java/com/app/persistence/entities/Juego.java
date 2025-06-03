@@ -2,6 +2,8 @@ package com.app.persistence.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,6 +43,7 @@ public class Juego {
 	private Episodio episodio;
 
 	@OneToMany(mappedBy = "juego", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private List<Apuesta> apuestas;
 
 }

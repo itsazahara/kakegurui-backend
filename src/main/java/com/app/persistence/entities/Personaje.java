@@ -47,6 +47,6 @@ public class Personaje {
 	
 	@OneToMany(mappedBy = "personaje", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
-	private List<Apuesta> apuestas;
+	private List<Apostador> apuestas;
 
 }

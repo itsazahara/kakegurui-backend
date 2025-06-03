@@ -28,7 +28,7 @@ public class Episodio {
 	private Integer id;
 
 	@Column(nullable = false)
-	private Integer temporadas;
+	private Integer temporada;
 
 	@Column(name = "numero_episodio", nullable = false)
 	private Integer numeroEpisodio;
