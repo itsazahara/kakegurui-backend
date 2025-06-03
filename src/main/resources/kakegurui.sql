@@ -22,7 +22,6 @@ CREATE TABLE juego (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
     reglas TEXT,
-    resultado TEXT,
     id_episodio INT NOT NULL,
     FOREIGN KEY (id_episodio) REFERENCES episodio(id) ON DELETE CASCADE
 );
@@ -31,6 +30,7 @@ CREATE TABLE apuesta (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_juego INT NOT NULL,
     descripcion TEXT,
+    resultado TEXT,
     FOREIGN KEY (id_juego) REFERENCES juego(id) ON DELETE CASCADE
 );
 

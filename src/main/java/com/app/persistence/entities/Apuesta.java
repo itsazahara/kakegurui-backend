@@ -31,6 +31,9 @@ public class Apuesta {
 	
 	@Column(nullable = false)
 	private String descripcion;
+	
+	@Column(columnDefinition = "TEXT", nullable = false)
+	private String resultado;
 
 	@ManyToOne
 	@JoinColumn(name = "id_juego", referencedColumnName = "id", insertable = false, updatable = false)

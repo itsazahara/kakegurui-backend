@@ -35,9 +35,6 @@ public class Juego {
 	@Column(columnDefinition = "TEXT", nullable = false)
 	private String reglas;
 
-	@Column(columnDefinition = "TEXT", nullable = false)
-	private String resultado;
-
 	@ManyToOne
 	@JoinColumn(name = "id_episodio", referencedColumnName = "id", insertable = false, updatable = false)
 	private Episodio episodio;
