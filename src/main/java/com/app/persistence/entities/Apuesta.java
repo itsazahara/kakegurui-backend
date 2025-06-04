@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,9 +40,10 @@ public class Apuesta {
 	@JoinColumn(name = "id_juego", referencedColumnName = "id", insertable = false, updatable = false)
 	private Juego juego;
 	
-	@OneToMany(mappedBy = "apuesta", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "apuesta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Apostador> participantes;
+
 
 
 }

@@ -6,7 +6,7 @@ CREATE TABLE personaje (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
     edad INT NOT NULL,
-    role ENUM('Protagonista', 'Estudiante', 'Miembro del Consejo Estudiantil', 'Dealer') NOT NULL,
+    role ENUM('Protagonista', 'Estudiante', 'Consejo', 'Dealer') NOT NULL,
     imagen LONGTEXT,
     descripcion TEXT
 );

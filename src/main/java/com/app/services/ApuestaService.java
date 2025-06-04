@@ -16,7 +16,7 @@ public class ApuestaService {
 
 	@Autowired
 	private ApuestaRepository apuestaRepository;
-	
+		
 	public List<Apuesta> findAll() {
         return apuestaRepository.findAll();
     }
@@ -48,4 +48,8 @@ public class ApuestaService {
 
         return null;
     }
+	
+	
+
+
 }

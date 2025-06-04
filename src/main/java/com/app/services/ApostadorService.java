@@ -48,5 +48,10 @@ public class ApostadorService {
 
 		return null;
 	}
+	
+	public List<Apostador> findByApuestaId(int apuestaId) {
+	    return apostadorRepository.findByApuestaId(apuestaId);
+	}
+
 
 }

@@ -29,8 +29,8 @@ public class Apostador {
 	private Integer id;
 	
 	@ManyToOne
-    @JoinColumn(name = "id_apuesta", nullable = false)
-    private Apuesta apuesta;
+	@JoinColumn(name = "id_apuesta", nullable = false)
+	private Apuesta apuesta;
 
     @ManyToOne
     @JoinColumn(name = "id_personaje", nullable = false)

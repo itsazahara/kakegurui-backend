@@ -17,9 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.persistence.entities.Apostador;
 import com.app.persistence.entities.Apuesta;
+import com.app.services.ApostadorService;
 import com.app.services.ApuestaService;
+import com.app.services.dtos.ApostadorDTO;
 import com.app.services.dtos.ApuestaDTO;
+import com.app.services.mappers.ApostadorMapper;
 import com.app.services.mappers.ApuestaMapper;
 
 @RestController
@@ -29,6 +33,9 @@ public class ApuestaController {
 
 	@Autowired
 	private ApuestaService apuestaService;
+	
+	@Autowired
+	private ApostadorService apostadorService;
 
 	@GetMapping
 	public ResponseEntity<List<ApuestaDTO>> apuestas() {
@@ -83,4 +90,16 @@ public class ApuestaController {
 
 		return ResponseEntity.notFound().build();
 	}
+	
+	@GetMapping("/{id}/apostadores")
+	public ResponseEntity<List<ApostadorDTO>> getApostadoresByApuestaId(@PathVariable int id) {
+	    List<Apostador> apostadores = apostadorService.findByApuestaId(id);
+	    List<ApostadorDTO> dtoList = apostadores.stream()
+	            .map(ApostadorMapper::toDto)
+	            .toList();
+	    return ResponseEntity.ok(dtoList);
+	}
+
+
+
 }
