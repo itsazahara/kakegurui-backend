@@ -1,9 +1,12 @@
 package com.app.web.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.persistence.entities.Personaje;
 import com.app.services.PersonajeService;
+import com.app.services.dtos.PersonajeDTO;
+import com.app.services.mappers.PersonajeMapper;
 
 @RestController
 @RequestMapping("/personajes")
@@ -26,29 +31,58 @@ public class PersonajeController {
     private PersonajeService personajeService;
 
     @GetMapping
-    public List<Personaje> getAll() {
-        return personajeService.findAll();
-    }
+	public ResponseEntity<List<PersonajeDTO>> personajes() {
+		List<Personaje> personajes = this.personajeService.findAll();
+		List<PersonajeDTO> personajesDTO = new ArrayList<>();
+		for (Personaje personaje : personajes) {
+			personajesDTO.add(PersonajeMapper.toDto(personaje));
+		}
+		return ResponseEntity.ok(personajesDTO);
+	}
 
-    @GetMapping("/{id}")
-    public Optional<Personaje> getById(@PathVariable Integer id) {
-        return personajeService.findById(id);
-    }
+    @GetMapping("/{idPersonaje}")
+	public ResponseEntity<PersonajeDTO> personaje(@PathVariable int idPersonaje) {
+		Optional<Personaje> personaje = this.personajeService.findById(idPersonaje);
+		if (personaje.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
 
+		return ResponseEntity.ok(PersonajeMapper.toDto(personaje.get()));
+	}
+    
     @PostMapping
-    public Personaje create(@RequestBody Personaje personaje) {
-        return personajeService.save(personaje);
-    }
+	public ResponseEntity<PersonajeDTO> create(@RequestBody Personaje personaje) {
+    	Personaje savedPersonaje = personajeService.create(personaje);
+    	PersonajeDTO personajeDTO = PersonajeMapper.toDto(savedPersonaje);
+		return new ResponseEntity<>(personajeDTO, HttpStatus.CREATED);
+	}
 
-    @PutMapping("/{id}")
-    public Personaje update(@PathVariable Integer id, @RequestBody Personaje personaje) {
-        personaje.setId(id);
-        return personajeService.save(personaje);
-    }
+	@PutMapping("/{idPersonaje}")
+	public ResponseEntity<PersonajeDTO> update(@PathVariable int idPersonaje,
+			@RequestBody PersonajeDTO personajeDTO) {
+		if (idPersonaje != personajeDTO.getId()) {
+			return ResponseEntity.badRequest().build();
+		}
+		if (!personajeService.existsPersonaje(idPersonaje)) {
+			return ResponseEntity.notFound().build();
+		}
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        personajeService.deleteById(id);
-    }
+		Personaje personaje = PersonajeMapper.toEntity(personajeDTO);
+		Personaje updatedPersonaje = personajeService.save(personaje);
+		PersonajeDTO responseDTO = PersonajeMapper.toDto(updatedPersonaje);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@DeleteMapping("/{idPersonaje}")
+	public ResponseEntity<PersonajeDTO> delete(@PathVariable int idPersonaje) {
+		PersonajeDTO personajeEliminado = personajeService.delete(idPersonaje);
+
+		if (personajeEliminado != null) {
+			return ResponseEntity.ok(personajeEliminado);
+		}
+
+		return ResponseEntity.notFound().build();
+	}
 
 }
