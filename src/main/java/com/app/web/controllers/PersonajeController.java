@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.persistence.entities.Personaje;
@@ -26,11 +27,11 @@ import com.app.services.mappers.PersonajeMapper;
 @RequestMapping("/personajes")
 @CrossOrigin(origins = "http://localhost:4200")
 public class PersonajeController {
-	
-	@Autowired
-    private PersonajeService personajeService;
 
-    @GetMapping
+	@Autowired
+	private PersonajeService personajeService;
+
+	@GetMapping
 	public ResponseEntity<List<PersonajeDTO>> personajes() {
 		List<Personaje> personajes = this.personajeService.findAll();
 		List<PersonajeDTO> personajesDTO = new ArrayList<>();
@@ -40,7 +41,7 @@ public class PersonajeController {
 		return ResponseEntity.ok(personajesDTO);
 	}
 
-    @GetMapping("/{idPersonaje}")
+	@GetMapping("/{idPersonaje}")
 	public ResponseEntity<PersonajeDTO> personaje(@PathVariable int idPersonaje) {
 		Optional<Personaje> personaje = this.personajeService.findById(idPersonaje);
 		if (personaje.isEmpty()) {
@@ -49,17 +50,16 @@ public class PersonajeController {
 
 		return ResponseEntity.ok(PersonajeMapper.toDto(personaje.get()));
 	}
-    
-    @PostMapping
+
+	@PostMapping
 	public ResponseEntity<PersonajeDTO> create(@RequestBody Personaje personaje) {
-    	Personaje savedPersonaje = personajeService.create(personaje);
-    	PersonajeDTO personajeDTO = PersonajeMapper.toDto(savedPersonaje);
+		Personaje savedPersonaje = personajeService.create(personaje);
+		PersonajeDTO personajeDTO = PersonajeMapper.toDto(savedPersonaje);
 		return new ResponseEntity<>(personajeDTO, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{idPersonaje}")
-	public ResponseEntity<PersonajeDTO> update(@PathVariable int idPersonaje,
-			@RequestBody PersonajeDTO personajeDTO) {
+	public ResponseEntity<PersonajeDTO> update(@PathVariable int idPersonaje, @RequestBody PersonajeDTO personajeDTO) {
 		if (idPersonaje != personajeDTO.getId()) {
 			return ResponseEntity.badRequest().build();
 		}
@@ -83,6 +83,13 @@ public class PersonajeController {
 		}
 
 		return ResponseEntity.notFound().build();
+	}
+
+	@GetMapping("/buscador")
+	public ResponseEntity<List<PersonajeDTO>> searchByNombre(@RequestParam String nombre) {
+		List<Personaje> personajes = personajeService.findByNombreContainingIgnoreCase(nombre);
+		List<PersonajeDTO> personajesDTO = personajes.stream().map(p -> PersonajeMapper.toDto(p)).toList();
+		return ResponseEntity.ok(personajesDTO);
 	}
 
 }
