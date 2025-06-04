@@ -1,9 +1,12 @@
 package com.app.web.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.persistence.entities.Juego;
 import com.app.services.JuegoService;
+import com.app.services.dtos.JuegoDTO;
+import com.app.services.mappers.JuegoMapper;
 
 @RestController
 @RequestMapping("/juegos")
@@ -26,28 +31,56 @@ public class JuegoController {
 	private JuegoService juegoService;
 
 	@GetMapping
-	public List<Juego> getAll() {
-		return juegoService.findAll();
+	public ResponseEntity<List<JuegoDTO>> juegos() {
+		List<Juego> juegos = this.juegoService.findAll();
+		List<JuegoDTO> juegosDTO = new ArrayList<>();
+		for (Juego juego : juegos) {
+			juegosDTO.add(JuegoMapper.toDto(juego));
+		}
+		return ResponseEntity.ok(juegosDTO);
 	}
 
-	@GetMapping("/{id}")
-	public Optional<Juego> getById(@PathVariable Integer id) {
-		return juegoService.findById(id);
+	@GetMapping("/{idPersonaje}")
+	public ResponseEntity<JuegoDTO> juego(@PathVariable int idJuego) {
+		Optional<Juego> juego = this.juegoService.findById(idJuego);
+		if (juego.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok(JuegoMapper.toDto(juego.get()));
 	}
 
 	@PostMapping
-	public Juego create(@RequestBody Juego j) {
-		return juegoService.save(j);
+	public ResponseEntity<JuegoDTO> create(@RequestBody Juego juego) {
+		Juego savedJuego = juegoService.create(juego);
+		JuegoDTO juegoDTO = JuegoMapper.toDto(savedJuego);
+		return new ResponseEntity<>(juegoDTO, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/{id}")
-	public Juego update(@PathVariable Integer id, @RequestBody Juego j) {
-		j.setId(id);
-		return juegoService.save(j);
+	@PutMapping("/{idJuego}")
+	public ResponseEntity<JuegoDTO> update(@PathVariable int idJuego, @RequestBody JuegoDTO juegoDTO) {
+		if (idJuego != juegoDTO.getId()) {
+			return ResponseEntity.badRequest().build();
+		}
+		if (!juegoService.existsJuego(idJuego)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Juego juego = JuegoMapper.toEntity(juegoDTO);
+		Juego updatedJuego = juegoService.save(juego);
+		JuegoDTO responseDTO = JuegoMapper.toDto(updatedJuego);
+
+		return ResponseEntity.ok(responseDTO);
 	}
 
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Integer id) {
-		juegoService.deleteById(id);
+	@DeleteMapping("/{idJuego}")
+	public ResponseEntity<JuegoDTO> delete(@PathVariable int idJuego) {
+		JuegoDTO juegoEliminado = juegoService.delete(idJuego);
+
+		if (juegoEliminado != null) {
+			return ResponseEntity.ok(juegoEliminado);
+		}
+
+		return ResponseEntity.notFound().build();
 	}
 }

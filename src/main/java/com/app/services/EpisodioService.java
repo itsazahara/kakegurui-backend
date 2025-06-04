@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.app.persistence.entities.Episodio;
 import com.app.persistence.repositories.EpisodioRepository;
+import com.app.services.dtos.EpisodioDTO;
+import com.app.services.mappers.EpisodioMapper;
 
 @Service
 public class EpisodioService {
@@ -35,7 +37,15 @@ public class EpisodioService {
 		return this.episodioRepository.save(episodio);
 	}
 	
-	public void deleteById(Integer id) {
-		episodioRepository.deleteById(id);
+	public EpisodioDTO delete(int idEpisodio) {
+        Optional<Episodio> episodioOptional = episodioRepository.findById(idEpisodio);
+
+        if (episodioOptional.isPresent()) {
+        	Episodio episodio = episodioOptional.get();
+        	episodioRepository.delete(episodio);
+            return EpisodioMapper.toDto(episodio);
+        }
+
+        return null;
     }
 }

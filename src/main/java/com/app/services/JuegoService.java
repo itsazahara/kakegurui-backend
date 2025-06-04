@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.app.persistence.entities.Juego;
 import com.app.persistence.repositories.JuegoRepository;
+import com.app.services.dtos.JuegoDTO;
+import com.app.services.mappers.JuegoMapper;
 
 @Service
 public class JuegoService {
@@ -35,8 +37,16 @@ public class JuegoService {
 		return this.juegoRepository.save(juego);
 	}
 	
-	public void deleteById(Integer id) {
-		juegoRepository.deleteById(id);
+	public JuegoDTO delete(int idJuego) {
+        Optional<Juego> juegoOptional = juegoRepository.findById(idJuego);
+
+        if (juegoOptional.isPresent()) {
+        	Juego juego = juegoOptional.get();
+        	juegoRepository.delete(juego);
+            return JuegoMapper.toDto(juego);
+        }
+
+        return null;
     }
 
 }

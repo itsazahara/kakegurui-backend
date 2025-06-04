@@ -13,7 +13,6 @@ public class JuegoDTO {
 	private Integer id;
 	private String nombre;
     private String reglas;
-    private String resultado;
     private EpisodioDTO episodio;
 
 }

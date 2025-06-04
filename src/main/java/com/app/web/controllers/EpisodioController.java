@@ -1,9 +1,12 @@
 package com.app.web.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.persistence.entities.Episodio;
 import com.app.services.EpisodioService;
+import com.app.services.dtos.EpisodioDTO;
+import com.app.services.mappers.EpisodioMapper;
 
 @RestController
 @RequestMapping("/episodios")
@@ -26,28 +31,57 @@ public class EpisodioController {
 	private EpisodioService episodioService;
 
 	@GetMapping
-	public List<Episodio> getAll() {
-		return episodioService.findAll();
+	public ResponseEntity<List<EpisodioDTO>> episodios() {
+		List<Episodio> episodios = this.episodioService.findAll();
+		List<EpisodioDTO> episodiosDTO = new ArrayList<>();
+		for (Episodio episodio : episodios) {
+			episodiosDTO.add(EpisodioMapper.toDto(episodio));
+		}
+		return ResponseEntity.ok(episodiosDTO);
 	}
 
-	@GetMapping("/{id}")
-	public Optional<Episodio> getById(@PathVariable Integer id) {
-		return episodioService.findById(id);
+    @GetMapping("/{idEpisodio}")
+	public ResponseEntity<EpisodioDTO> episodio(@PathVariable int idEpisodio) {
+		Optional<Episodio> episodio = this.episodioService.findById(idEpisodio);
+		if (episodio.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok(EpisodioMapper.toDto(episodio.get()));
+	}
+    
+    @PostMapping
+	public ResponseEntity<EpisodioDTO> create(@RequestBody Episodio episodio) {
+    	Episodio savedEpisodio = episodioService.create(episodio);
+    	EpisodioDTO episodioDTO = EpisodioMapper.toDto(savedEpisodio);
+		return new ResponseEntity<>(episodioDTO, HttpStatus.CREATED);
 	}
 
-	@PostMapping
-	public Episodio create(@RequestBody Episodio e) {
-		return episodioService.save(e);
+	@PutMapping("/{idEpisodio}")
+	public ResponseEntity<EpisodioDTO> update(@PathVariable int idEpisodio,
+			@RequestBody EpisodioDTO episodioDTO) {
+		if (idEpisodio != episodioDTO.getId()) {
+			return ResponseEntity.badRequest().build();
+		}
+		if (!episodioService.existsEpisodio(idEpisodio)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Episodio episodio = EpisodioMapper.toEntity(episodioDTO);
+		Episodio updatedEpisodio = episodioService.save(episodio);
+		EpisodioDTO responseDTO = EpisodioMapper.toDto(updatedEpisodio);
+
+		return ResponseEntity.ok(responseDTO);
 	}
 
-	@PutMapping("/{id}")
-	public Episodio update(@PathVariable Integer id, @RequestBody Episodio e) {
-		e.setId(id);
-		return episodioService.save(e);
-	}
+	@DeleteMapping("/{idEpisodio}")
+	public ResponseEntity<EpisodioDTO> delete(@PathVariable int idEpisodio) {
+		EpisodioDTO episodioEliminado = episodioService.delete(idEpisodio);
 
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Integer id) {
-		episodioService.deleteById(id);
+		if (episodioEliminado != null) {
+			return ResponseEntity.ok(episodioEliminado);
+		}
+
+		return ResponseEntity.notFound().build();
 	}
 }
