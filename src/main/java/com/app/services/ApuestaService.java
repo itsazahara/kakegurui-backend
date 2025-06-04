@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.app.persistence.entities.Apuesta;
 import com.app.persistence.repositories.ApuestaRepository;
+import com.app.services.dtos.ApuestaDTO;
+import com.app.services.mappers.ApuestaMapper;
 
 @Service
 public class ApuestaService {
@@ -35,7 +37,15 @@ public class ApuestaService {
 		return this.apuestaRepository.save(apuesta);
 	}
 	
-	public void deleteById(Integer id) {
-		apuestaRepository.deleteById(id);
+	public ApuestaDTO delete(int idApuesta) {
+        Optional<Apuesta> apuestaOptional = apuestaRepository.findById(idApuesta);
+
+        if (apuestaOptional.isPresent()) {
+        	Apuesta apuesta = apuestaOptional.get();
+        	apuestaRepository.delete(apuesta);
+            return ApuestaMapper.toDto(apuesta);
+        }
+
+        return null;
     }
 }

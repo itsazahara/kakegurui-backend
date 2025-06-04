@@ -8,27 +8,45 @@ import org.springframework.stereotype.Service;
 
 import com.app.persistence.entities.Apostador;
 import com.app.persistence.repositories.ApostadorRepository;
+import com.app.services.dtos.ApostadorDTO;
+import com.app.services.mappers.ApostadorMapper;
 
 @Service
 public class ApostadorService {
-	
+
 	@Autowired
 	private ApostadorRepository apostadorRepository;
+
+	public List<Apostador> findAll() {
+		return apostadorRepository.findAll();
+	}
+
+	public Optional<Apostador> findById(Integer id) {
+		return apostadorRepository.findById(id);
+	}
 	
-    public List<Apostador> findAll() {
-        return apostadorRepository.findAll();
-    }
+	public boolean existsApostador(int idApostador) {
+	    return this.apostadorRepository.existsById(idApostador);
+	}
+	
+	public Apostador create(Apostador apostador) {
+		return this.apostadorRepository.save(apostador);
+	}
 
-    public Optional<Apostador> findById(Integer id) {
-        return apostadorRepository.findById(id);
-    }
+	public Apostador save(Apostador apostador) {
+		return apostadorRepository.save(apostador);
+	}
 
-    public Apostador save(Apostador apostador) {
-        return apostadorRepository.save(apostador);
-    }
+	public ApostadorDTO delete(int idApostador) {
+		Optional<Apostador> apostadorOptional = apostadorRepository.findById(idApostador);
 
-    public void deleteById(Integer id) {
-        apostadorRepository.deleteById(id);
-    }
+		if (apostadorOptional.isPresent()) {
+			Apostador apostador = apostadorOptional.get();
+			apostadorRepository.delete(apostador);
+			return ApostadorMapper.toDto(apostador);
+		}
+
+		return null;
+	}
 
 }
